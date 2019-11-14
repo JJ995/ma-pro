@@ -1,29 +1,37 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
+import Entries from '../data/entries'
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
-const routes = [
-  {
-    path: '/',
-    name: 'home',
-    component: Home
-  },
-  {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  }
-]
+const blogRoutes = Object.keys(Entries).map(section => {
+    const children = Entries[section].map(child => ({
+        path: child.id,
+        name: child.id,
+        component: () => import(`../../content/${section}/${child.id}.md`).then((markdownComponent) => {
+            return markdownComponent.vue.component;
+        })
+    }));
+    return {
+        path: `/${section}`,
+        name: section,
+        component: () => import('../views/Blog.vue'),
+        children
+    }
+});
 
 const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
-  routes
-})
+    mode: 'history',
+    base: process.env.BASE_URL,
+    routes: [
+        {
+            path: '/',
+            name: 'home',
+            component: Home
+        },
+        ...blogRoutes
+    ]
+});
 
 export default router

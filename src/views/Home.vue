@@ -15,7 +15,7 @@
 </template>
 
 <script>
-    import entries from '../data/entries'
+    import entries from '../data/manifest'
 
     export default {
         name: 'home',

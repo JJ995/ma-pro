@@ -1,5 +1,5 @@
 <template>
-    <div class="blog">
+    <div class="content">
         <router-view/>
         <router-link to="/">&laquo; Back</router-link>
     </div>
@@ -7,6 +7,6 @@
 
 <script>
     export default {
-        name: 'blog',
+        name: 'content'
     }
 </script>

@@ -1,14 +1,20 @@
 /*
- * https://stackoverflow.com/questions/58325548/how-to-execute-my-own-script-after-every-webpacks-auto-build-in-watch-mode-of-v
+ * Hooks: https://stackoverflow.com/questions/58325548/how-to-execute-my-own-script-after-every-webpacks-auto-build-in-watch-mode-of-v
  */
 
-
+// Includes
 const Mode = require('frontmatter-markdown-loader/mode');
-//const fs = require("fs");
+const path = require('path');
+
+// Import custom modules
+const generateManifest = require('./src/node/generateManifest');
 
 const plugins = [];
-const isDev = process.env.NODE_ENV === 'development';
 
+/**
+ * Initialize before run hook
+ * @param callback
+ */
 const beforeRunHook = function(callback) {
     this.apply = function(compiler) {
         if (compiler.hooks && compiler.hooks.watchRun) {
@@ -16,23 +22,8 @@ const beforeRunHook = function(callback) {
         }
     };
 };
-
-const generateManifest = function() {
-    console.log('Implementing alien intelligence and more HELLO HELLO HELLO HELLO HELLO HELLO HELLO HELLO HELLO HELLO HELLO HELLO VHELLO HELLO HELLO');
-    /*fs.readdir("../content/stories", files => {
-        console.log(files);
-        files.foreach(file => {
-            fs.readFile(`../content/stories/${file}`, data => {
-                console.log('HI DATA FOLLOWING');
-                console.log(data);
-            });
-        });
-    });*/
-};
-
-if (isDev) {
-    plugins.push(new beforeRunHook(generateManifest));
-}
+// Add hook
+plugins.push(new beforeRunHook(generateManifest));
 
 module.exports = {
     chainWebpack: config => {
@@ -51,6 +42,14 @@ module.exports = {
         })
     },
     configureWebpack: {
-        plugins
+        plugins,
+        devServer: {
+            watchOptions: {
+                // Ignore
+                ignored: [
+                    path.resolve(__dirname, 'src/data/manifest.json')
+                ]
+            }
+        },
     }
 };

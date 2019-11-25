@@ -10,4 +10,6 @@ A test entry using markdown with new content with button (**a real Vue component
 
 <ButtonCounter />
 
+Here comes a router link: <router-link to="/stories/test2">Test 2</router-link>
+
 ---

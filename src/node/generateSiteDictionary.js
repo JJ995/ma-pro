@@ -4,6 +4,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const fm = require('front-matter');
 
 // Constants
 const CONTENT_DIRECTORY_PATH = './content/';
@@ -11,8 +12,8 @@ const CONTENT_DIRECTORY_PATH = './content/';
 /**
  * Generate JSON-file with router page data based on content directory
  */
-module.exports = function generateManifest() {
-    console.log('Start manifest generation');
+module.exports = async function generateSiteDictionary() {
+    console.log('Start site dictionary generation');
 
     let routes = {};                    // Routes object (stores page path and page metadata)
 
@@ -20,7 +21,7 @@ module.exports = function generateManifest() {
     let fileList = findInDir(CONTENT_DIRECTORY_PATH, /\.md$/);
 
     // Iterate file list
-    fileList.forEach((fullPath) => {
+    for (const fullPath of fileList) {
         // Get page name and page path
         let page = fullPath.substring(fullPath.lastIndexOf('\\') + 1, fullPath.length - 3);
         let path = fullPath.substring(fullPath.indexOf('\\') + 1, fullPath.lastIndexOf('\\')).replace(/\\/g, '/');
@@ -30,19 +31,28 @@ module.exports = function generateManifest() {
             routes[path] = [];
         }
 
-        // Add page object to route
-        routes[path].push({
-            "id": page,
-            "title": page,
-            "path": path
+        // Get front-matter page metadata
+        await fs.promises.readFile(fullPath, 'utf8').then((data) => {
+            let content = fm(data);
+
+            // Add page object to route
+            routes[path].push({
+                "id": page,
+                "title": page,
+                "description": content.attributes.description,
+                "date": content.attributes.date,
+                "path": path
+            });
+        }).catch((err) => {
+            if (err) throw err;
         });
-    });
+    }
 
-    // Write manifest JSON-file with routes
+    // Write sites JSON-file with routes
     let data = JSON.stringify(routes);
-    fs.writeFileSync('./src/data/manifest.json', data);
+    fs.writeFileSync('./src/data/sites.json', data);
 
-    console.log('Manifest written');
+    console.log('Site dictionary written');
 };
 
 /**

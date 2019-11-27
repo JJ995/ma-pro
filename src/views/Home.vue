@@ -6,7 +6,7 @@
                 <h2 class="center">{{section}}</h2>
                 <div class="section" v-for="entry in entries[section]" :key="entry.id">
                     <div class="entry">
-                        <router-link :to="{name: entry.id}">{{entry.title}}</router-link>
+                        <router-link :to="{name: entry.id}">{{entry.title}} ({{entry.date}}, {{entry.description}})</router-link>
                     </div>
                 </div>
             </div>
@@ -15,7 +15,7 @@
 </template>
 
 <script>
-    import entries from '../data/manifest'
+    import entries from '../data/sites'
 
     export default {
         name: 'home',

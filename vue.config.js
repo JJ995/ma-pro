@@ -8,7 +8,7 @@ const Mode = require('frontmatter-markdown-loader/mode');
 const path = require('path');
 
 // Import custom modules
-const generateManifest = require('./src/node/generateManifest');
+const generateSiteDictionary = require('./src/node/generateSiteDictionary');
 
 const plugins = [];
 
@@ -24,7 +24,7 @@ const beforeRunHook = function (callback) {
     };
 };
 // Add hook
-plugins.push(new beforeRunHook(generateManifest));
+plugins.push(new beforeRunHook(generateSiteDictionary));
 
 /**
  * Print list of changed files since last build to console
@@ -68,7 +68,7 @@ module.exports = {
             watchOptions: {
                 // Ignore
                 ignored: [
-                    path.resolve(__dirname, 'src/data/manifest.json')
+                    path.resolve(__dirname, 'src/data/sites.json')
                 ]
             }
         },

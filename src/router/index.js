@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
-import ButtonCounter from "../components/ButtonCounter";
 import Entries from '../data/sites'
 
 Vue.use(VueRouter);
@@ -11,9 +10,10 @@ const routes = Object.keys(Entries).map(section => {
         path: child.id,
         name: child.title,
         component: () => import(`../../content/${section}/${child.id}.md`).then((markdownComponent) => {
-            markdownComponent.vue.component.components = {
-                ButtonCounter
-            };
+            markdownComponent.vue.component.components = {};
+            for (let i = 0; i < child.components.length; i++) {
+                markdownComponent.vue.component.components[child.components[i]] = () => import(`../components/${child.components[i]}.vue`);
+            }
             return markdownComponent.vue.component;
         })
     }));

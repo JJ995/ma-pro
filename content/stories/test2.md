@@ -7,3 +7,8 @@ date: 13.11.2019
 # Test 2
 
 Another test entry using markdown
+
+<ButtonCounter />
+<ButtonCounter />
+
+---

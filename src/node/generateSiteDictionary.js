@@ -1,10 +1,9 @@
-/*
- * Recursive file tree reader with regex file-type filter: https://gist.github.com/kethinov/6658166
- */
 
 const fs = require('fs');
-const path = require('path');
 const fm = require('front-matter');
+
+const findInDir = require('./findInDir');
+const generateComponentDictionary = require('./generateComponentDictionary');
 
 // Constants
 const CONTENT_DIRECTORY_PATH = './content/';
@@ -15,10 +14,16 @@ const CONTENT_DIRECTORY_PATH = './content/';
 module.exports = async function generateSiteDictionary() {
     console.log('Start site dictionary generation');
 
+    // Trigger component dictionary generation
+    generateComponentDictionary();
+
     let routes = {};                    // Routes object (stores page path and page metadata)
 
     // Find all .md files in content directory
     let fileList = findInDir(CONTENT_DIRECTORY_PATH, /\.md$/);
+
+    // Get component list
+    let components = require("../data/components");
 
     // Iterate file list
     for (const fullPath of fileList) {
@@ -34,6 +39,14 @@ module.exports = async function generateSiteDictionary() {
         // Get front-matter page metadata
         await fs.promises.readFile(fullPath, 'utf8').then((data) => {
             let content = fm(data);
+            let pageComponents = [];
+
+            // Check for component occurrences
+            for (let i = 0; i < components.length; i++) {
+                if (data.indexOf('<' + components[i]) !== -1) {
+                    pageComponents.push(components[i]);
+                }
+            }
 
             // Add page object to route
             routes[path].push({
@@ -41,7 +54,8 @@ module.exports = async function generateSiteDictionary() {
                 "title": page,
                 "description": content.attributes.description,
                 "date": content.attributes.date,
-                "path": path
+                "path": path,
+                "components": pageComponents
             });
         }).catch((err) => {
             if (err) throw err;
@@ -54,27 +68,3 @@ module.exports = async function generateSiteDictionary() {
 
     console.log('Site dictionary written');
 };
-
-/**
- * Parse given directory tree and return paths for given file-type
- * @param dir
- * @param filter
- * @param fileList
- * @returns {Array}
- */
-function findInDir (dir, filter, fileList = []) {
-    const files = fs.readdirSync(dir);
-
-    files.forEach((file) => {
-        const filePath = path.join(dir, file);
-        const fileStat = fs.lstatSync(filePath);
-
-        if (fileStat.isDirectory()) {
-            findInDir(filePath, filter, fileList);
-        } else if (filter.test(filePath)) {
-            fileList.push(filePath);
-        }
-    });
-
-    return fileList;
-}

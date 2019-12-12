@@ -1,10 +1,10 @@
 <template>
-    <button v-on:click="count++">{{ text }} | You clicked me {{ count }} times.</button>
+    <button v-on:click="count--">{{ text }} | You decremented me {{ count }} times.</button>
 </template>
 
 <script>
     export default {
-        name: 'ButtonCounter',
+        name: 'ButtonDecrementer',
         props: ['text'],
         data: function () {
             return {

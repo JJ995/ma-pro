@@ -5,6 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "refresh": "node --input-type=module -e \"import generateSiteDictionary from './src/node/generateSiteDictionary.js'; generateSiteDictionary();\"",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {

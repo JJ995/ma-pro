@@ -8,7 +8,7 @@ date: 13.11.2019
 
 Another test entry using markdown
 
-<ButtonCounter />
-<ButtonCounter />
+<ButtonIncrement />
+<ButtonIncrement />
 
 ---

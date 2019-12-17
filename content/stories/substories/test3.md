@@ -7,3 +7,7 @@ date: 16.11.2019
 # Test 3
 
 A test entry using markdown from a subdirectory
+
+<Counter headline="This is a counter component with two subcomponents"/>
+
+---

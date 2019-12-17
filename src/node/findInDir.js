@@ -2,8 +2,8 @@
  * Recursive file tree reader with regex file-type filter: https://gist.github.com/kethinov/6658166
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 /**
  * Parse given directory tree and return paths for given file-type
@@ -12,7 +12,7 @@ const path = require('path');
  * @param fileList
  * @returns {Array}
  */
-module.exports = function findInDir (dir, filter, fileList = []) {
+export default function findInDir (dir, filter, fileList = []) {
     const files = fs.readdirSync(dir);
 
     files.forEach((file) => {
@@ -27,4 +27,4 @@ module.exports = function findInDir (dir, filter, fileList = []) {
     });
 
     return fileList;
-};
+}

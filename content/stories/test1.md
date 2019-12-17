@@ -8,8 +8,8 @@ date: 13.11.2019
 
 A test entry using markdown with new content with button (**a real Vue component!**)
 
-<ButtonCounter text="+"/>
-<ButtonDecrementer text="-"/>
+<ButtonIncrement text="+"/>
+<ButtonDecrement text="-"/>
 
 Here comes a router link: <router-link to="/stories/test2">Test 2</router-link>
 

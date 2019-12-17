@@ -1,9 +1,9 @@
 
-const fs = require('fs');
-const fm = require('front-matter');
+import fs  from 'fs';
+import fm from 'front-matter';
 
-const findInDir = require('./findInDir');
-const generateComponentDictionary = require('./generateComponentDictionary');
+import findInDir from './findInDir.js';
+import generateComponentDictionary from './generateComponentDictionary.js';
 
 // Constants
 const CONTENT_DIRECTORY_PATH = './content/';
@@ -11,7 +11,7 @@ const CONTENT_DIRECTORY_PATH = './content/';
 /**
  * Generate JSON-file with router page data based on content directory
  */
-module.exports = async function generateSiteDictionary() {
+export default async function () {
     console.log('Start site dictionary generation');
 
     // Trigger component dictionary generation
@@ -23,7 +23,8 @@ module.exports = async function generateSiteDictionary() {
     let fileList = findInDir(CONTENT_DIRECTORY_PATH, /\.md$/);
 
     // Get component list
-    let components = require("../data/components");
+    let componentsJson = fs.readFileSync('./src/data/components.json', 'utf8');
+    let components = JSON.parse(componentsJson);
 
     // Iterate file list
     for (const fullPath of fileList) {
@@ -43,7 +44,7 @@ module.exports = async function generateSiteDictionary() {
 
             // Check for component occurrences
             for (let i = 0; i < components.length; i++) {
-                if (data.indexOf('<' + components[i]) !== -1) {
+                if (data.indexOf('<' + components[i].name) !== -1) {
                     pageComponents.push(components[i]);
                 }
             }

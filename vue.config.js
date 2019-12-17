@@ -8,7 +8,7 @@ const Mode = require('frontmatter-markdown-loader/mode');
 const path = require('path');
 
 // Import custom modules
-const generateSiteDictionary = require('./src/node/generateSiteDictionary');
+//const generateSiteDictionary = require('./src/node/generateSiteDictionary');
 
 const plugins = [];
 
@@ -23,8 +23,9 @@ const beforeRunHook = function (callback) {
         }
     };
 };
+// TODO: trigger refresh command in hook instead of directly calling dictionary generation
 // Add hook
-plugins.push(new beforeRunHook(generateSiteDictionary));
+//plugins.push(new beforeRunHook(generateSiteDictionary));
 
 /**
  * Print list of changed files since last build to console

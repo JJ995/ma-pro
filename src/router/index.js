@@ -12,7 +12,13 @@ const routes = Object.keys(Entries).map(section => {
         component: () => import(`../../content/${section}/${child.id}.md`).then((markdownComponent) => {
             markdownComponent.vue.component.components = {};
             for (let i = 0; i < child.components.length; i++) {
-                markdownComponent.vue.component.components[child.components[i]] = () => import(`../components/${child.components[i]}.vue`);
+                /**
+                 * import path cannot be prebuilt for some reason:
+                 * 1. make path relative to router index.js file location
+                 * 2. remove first 4 chars ('src/')
+                 * 3. replace backslashes with forward slashes
+                 */
+                markdownComponent.vue.component.components[child.components[i].name] = () => import('../' + (`${child.components[i].path}.vue`).substr(4).replace(/\\/g,"/"));
             }
             return markdownComponent.vue.component;
         })

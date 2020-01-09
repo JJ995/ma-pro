@@ -1,14 +1,13 @@
 /*
  * Hooks: https://stackoverflow.com/questions/58325548/how-to-execute-my-own-script-after-every-webpacks-auto-build-in-watch-mode-of-v
  * Get list of changed files: https://stackoverflow.com/questions/43140501/can-webpack-report-which-file-triggered-a-compilation-in-watch-mode
+ * Merge arrays and remove duplicates (ES6): https://stackoverflow.com/a/48130841
  */
 
-// Includes
+/* Includes */
 const Mode = require('frontmatter-markdown-loader/mode');
-const path = require('path');
-
-// Import custom modules
-//const generateSiteDictionary = require('./src/node/generateSiteDictionary');
+const exec = require('child_process').exec;
+const fs = require('fs');
 
 const plugins = [];
 
@@ -23,28 +22,128 @@ const beforeRunHook = function (callback) {
         }
     };
 };
-// TODO: trigger refresh command in hook instead of directly calling dictionary generation
-// Add hook
-//plugins.push(new beforeRunHook(generateSiteDictionary));
 
 /**
- * Print list of changed files since last build to console
+ * Refresh trigger function - updates site and component dictionary
+ */
+const refresh = function () {
+    exec('npm run refresh', (error, stdout, stderr) => {
+        if (error) {
+            console.log(`error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.log(`stderr: ${stderr}`);
+            return;
+        }
+        console.log(`stdout: ${stdout}`);
+    });
+};
+
+// Add hook for dictionary update
+plugins.push(new beforeRunHook(refresh));
+
+/**
+ * Track file changes for content files (routes), components and views
  */
 class WatchRunPlugin {
     apply(compiler) {
         compiler.hooks.watchRun.tap('WatchRun', (comp) => {
+            const CONTENT_PATH = '\\content\\';
+            const COMPONENT_PATH = '\\src\\components\\';
+            const VIEW_PATH = '\\src\\views\\';
+
+            const CHANGED_ROUTES_PATH = './src/data/changedRoutes.json';
+            const SITES_PATH = './src/data/sites.json';
+
+            // Get list of changed files
             const changedTimes = comp.watchFileSystem.watcher.mtimes;
-            const changedFiles = Object.keys(changedTimes)
-            .map(file => `\n  ${file}`)
-            .join('');
+            const changedFiles = Object.keys(changedTimes);
             if (changedFiles.length) {
-                console.log("====================================");
-                console.log('NEW BUILD FILES CHANGED:', changedFiles);
-                console.log("====================================");
+                // List of routes to regenerate
+                let changedRoutes = [];
+
+                changedFiles.forEach((file) => {
+                    // Extract relative file path
+                    const relativePath = file.replace(__dirname, '');
+
+                    /* Check file type */
+                    if (relativePath.startsWith(CONTENT_PATH)) {                                // Route
+                        // Extract route
+                        let route = relativePath.replace(CONTENT_PATH, '');
+                        // Strip file extension, replace backslash with forward slash
+                        route = route.substring(0, route.length - 3).replace(/\\/g,'/');
+                        // Add route to list of changed routes
+                        changedRoutes.push(route);
+                    } else if (relativePath.startsWith(COMPONENT_PATH)) {                       // Component
+                        // Get component name (containing folder *must* be named accordingly)
+                        const componentPathElements = relativePath.split('\\');
+                        const componentName = componentPathElements[componentPathElements.length - 2];
+
+                        try {
+                            // Get sites dictionary
+                            const sites = JSON.parse(fs.readFileSync(SITES_PATH, 'utf8'));
+                            // Check if changed component is included on site
+                            sites.forEach((site) => {
+                                if (site.components.length !== 0) {
+                                    console.log(componentName);
+                                    console.log(site.components);
+                                    site.components.forEach((component) => {
+                                        if (component.name === componentName) {
+                                            // Add route to list of changed routes
+                                            changedRoutes.push(site.path + '/' + site.id);
+                                        }
+                                        // Check child components
+                                        if (component.childComponents !== undefined) {
+                                            if (component.childComponents.includes(componentName)) {
+                                                // Add route to list of changed routes
+                                                changedRoutes.push(site.path + '/' + site.id);
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                            console.log(changedRoutes);
+                        } catch (err) { console.error(err); }
+                    } else if (relativePath.startsWith(VIEW_PATH)) {                            // View
+                        // View
+                        // TODO: think about implementation (regenerate everything if a view changes?)
+                        console.log('view');
+                    }
+                });
+
+                // Write log file
+                writeChangeLog(CHANGED_ROUTES_PATH, changedRoutes);
             }
         });
     }
 }
+
+/**
+ * Write change log file - create a new file or append to existing file without duplicates
+ * @param path
+ * @param changes
+ */
+const writeChangeLog = function (path, changes) {
+    try {
+        // Check if change log already exists
+        if (fs.existsSync(path)) {
+            // Open existing change log
+            const prevChanges = JSON.parse(fs.readFileSync(path, 'utf8'));
+            // Merge existing list with list of new changes and remove duplicates
+            const data = Array.from(new Set(prevChanges.concat(changes)));
+            // Write route change log
+            fs.writeFileSync(path, JSON.stringify(data));
+        } else {
+            // Create new change log and write data
+            fs.writeFileSync(path, JSON.stringify(changes));
+        }
+    } catch (err) {
+        console.error(err);
+    }
+};
+
+// Add watcher plugin
 plugins.push(new WatchRunPlugin());
 
 module.exports = {
@@ -69,7 +168,11 @@ module.exports = {
             watchOptions: {
                 // Ignore
                 ignored: [
-                    path.resolve(__dirname, 'src/data/sites.json')
+                    __dirname + '\\src\\data\\changedRoutes.json',
+                    __dirname + '\\src\\data\\components.json',
+                    __dirname + '\\src\\data\\sites.json',
+                    __dirname + '\\.idea\\',
+                    __dirname + '\\vue.config.js',
                 ]
             }
         },

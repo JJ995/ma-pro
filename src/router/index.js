@@ -18,7 +18,7 @@ const routes = Object.keys(Entries).map(section => {
                  * 2. remove first 4 chars ('src/')
                  * 3. replace backslashes with forward slashes
                  */
-                markdownComponent.vue.component.components[child.components[i].name] = () => import('../' + (`${child.components[i].path}.vue`).substr(4).replace(/\\/g,"/"));
+                markdownComponent.vue.component.components[child.components[i].name] = () => import('../' + (`${child.components[i].path}.vue`).substr(4).replace(/\\/g,'/'));
             }
             return markdownComponent.vue.component;
         })

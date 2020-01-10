@@ -84,26 +84,25 @@ class WatchRunPlugin {
                             // Get sites dictionary
                             const sites = JSON.parse(fs.readFileSync(SITES_PATH, 'utf8'));
                             // Check if changed component is included on site
-                            sites.forEach((site) => {
-                                if (site.components.length !== 0) {
-                                    console.log(componentName);
-                                    console.log(site.components);
-                                    site.components.forEach((component) => {
-                                        if (component.name === componentName) {
-                                            // Add route to list of changed routes
-                                            changedRoutes.push(site.path + '/' + site.id);
-                                        }
-                                        // Check child components
-                                        if (component.childComponents !== undefined) {
-                                            if (component.childComponents.includes(componentName)) {
+                            Object.keys(sites).map(sitePath => {
+                                sites[sitePath].map(site => {
+                                    if (site.components.length !== 0) {
+                                        site.components.forEach((component) => {
+                                            if (component.name === componentName) {
                                                 // Add route to list of changed routes
                                                 changedRoutes.push(site.path + '/' + site.id);
                                             }
-                                        }
-                                    });
-                                }
+                                            // Check child components
+                                            if (component.childComponents !== undefined) {
+                                                if (component.childComponents.includes(componentName)) {
+                                                    // Add route to list of changed routes
+                                                    changedRoutes.push(sitePath + '/' + site.id);
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
                             });
-                            console.log(changedRoutes);
                         } catch (err) { console.error(err); }
                     } else if (relativePath.startsWith(VIEW_PATH)) {                            // View
                         // View
@@ -175,6 +174,9 @@ module.exports = {
                     __dirname + '\\vue.config.js',
                 ]
             }
+        },
+        externals: {
+            puppeteer: 'require("puppeteer")',
         },
     }
 };

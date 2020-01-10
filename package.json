@@ -6,11 +6,15 @@
     "serve": "npm run lint -- --fix && vue-cli-service serve",
     "build": "npm run lint -- --fix && vue-cli-service build",
     "refresh": "node --input-type=module -e \"import generateSiteDictionary from './src/node/generateSiteDictionary.js'; generateSiteDictionary();\"",
+    "generate": "node --input-type=module -e \"import prerender from './src/node/prerender.js'; prerender();\"",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@prerenderer/prerenderer": "^0.7.2",
+    "@prerenderer/renderer-puppeteer": "^0.2.0",
     "core-js": "^3.3.2",
     "front-matter": "^3.0.2",
+    "mkdirp": "^0.5.1",
     "vue": "^2.6.10",
     "vue-router": "^3.1.3"
   },

@@ -17,7 +17,7 @@ export default async function () {
     // Trigger component dictionary generation
     await generateComponentDictionary();
 
-    let routes = [];                    // Routes array (stores page path and page metadata)
+    let routes = {};                    // Routes object (stores page path and page metadata)
 
     // Find all .md files in content directory
     let fileList = findInDir(CONTENT_DIRECTORY_PATH, /\.md$/);
@@ -50,7 +50,7 @@ export default async function () {
             }
 
             // Add page object to route
-            routes.push({
+            routes[path].push({
                 "id": page,
                 "title": page,
                 "description": content.attributes.description,

@@ -6,7 +6,7 @@ import PreRenderer from '@prerenderer/prerenderer';
 import PuppeteerRenderer from '@prerenderer/renderer-puppeteer';
 
 /**
- *
+ * Static site generation based on list of changed routes
  */
 export default function () {
     console.log('Start static site generation');
@@ -14,21 +14,28 @@ export default function () {
     const __dirname = path.resolve();
 
     const preRenderer = new PreRenderer({
-        // Required - The path to the app to pre-render. Should have an index.html and any other needed assets.
+        // Required - the path to the app to pre-render - should have an index.html and any other needed assets
         staticDir: path.join(__dirname, 'dist'),
         indexPath: path.join(__dirname, 'dist/index.html'),
-        // The plugin that actually renders the page.
+        // The plugin that actually renders the page
         renderer: new PuppeteerRenderer({
+            // Options for debugging
             headless: false,
             devtools: true
         })
     });
 
-    // Initialize is separate from the constructor for flexibility of integration with build systems.
+    // Initialize is separate from the constructor for flexibility of integration with build systems
     preRenderer.initialize()
     .then(() => {
-        // List of routes to render.
-        return preRenderer.renderRoutes([ '/', '/stories/test1' ])
+        // Get list of changed routes to pre-render
+        const changedRoutes = JSON.parse(fs.readFileSync('./src/data/changedRoutes.json', 'utf8'));
+
+        // Add index route to generation
+        changedRoutes.push('/');
+
+        // List of routes to render
+        return preRenderer.renderRoutes(changedRoutes);
     })
     .then(renderedRoutes => {
         // renderedRoutes is an array of objects in the format:
@@ -38,25 +45,24 @@ export default function () {
         // }
         renderedRoutes.forEach(renderedRoute => {
             try {
-                // A smarter implementation would be required, but this does okay for an example.
-                // Don't copy this directly!!!
-                const outputDir = path.join(__dirname, 'rendered', renderedRoute.route);
+                // Generate static files
+                const outputDir = path.join(__dirname, 'generated_static', renderedRoute.route);
                 const outputFile = `${outputDir}/index.html`;
 
                 mkdirp.sync(outputDir);
-                fs.writeFileSync(outputFile, renderedRoute.html.trim())
+                fs.writeFileSync(outputFile, renderedRoute.html.trim());
             } catch (e) {
-                // Handle errors.
+                console.error(e);
             }
         });
 
-        // Shut down the file server and renderer.
-        preRenderer.destroy()
+        // Shut down server and renderer
+        preRenderer.destroy();
     })
     .catch(err => {
-        // Shut down the server and renderer.
-        preRenderer.destroy()
-        // Handle errors.
+        // Shut down server and renderer
+        preRenderer.destroy();
+        console.error(err);
     });
 
     console.log('Finished static site generation');

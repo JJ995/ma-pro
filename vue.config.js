@@ -74,7 +74,7 @@ class WatchRunPlugin {
                         // Strip file extension, replace backslash with forward slash
                         route = route.substring(0, route.length - 3).replace(/\\/g,'/');
                         // Add route to list of changed routes
-                        changedRoutes.push(route);
+                        changedRoutes.push('/' + route);
                     } else if (relativePath.startsWith(COMPONENT_PATH)) {                       // Component
                         // Get component name (containing folder *must* be named accordingly)
                         const componentPathElements = relativePath.split('\\');
@@ -90,13 +90,13 @@ class WatchRunPlugin {
                                         site.components.forEach((component) => {
                                             if (component.name === componentName) {
                                                 // Add route to list of changed routes
-                                                changedRoutes.push(site.path + '/' + site.id);
+                                                changedRoutes.push('/' + site.path + '/' + site.id);
                                             }
                                             // Check child components
                                             if (component.childComponents !== undefined) {
                                                 if (component.childComponents.includes(componentName)) {
                                                     // Add route to list of changed routes
-                                                    changedRoutes.push(sitePath + '/' + site.id);
+                                                    changedRoutes.push('/' + sitePath + '/' + site.id);
                                                 }
                                             }
                                         });

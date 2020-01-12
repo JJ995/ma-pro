@@ -6,7 +6,7 @@
     "serve": "npm run lint -- --fix && vue-cli-service serve",
     "build": "npm run lint -- --fix && vue-cli-service build",
     "refresh": "node --input-type=module -e \"import generateSiteDictionary from './src/node/generateSiteDictionary.js'; generateSiteDictionary();\"",
-    "generate": "node --input-type=module -e \"import prerender from './src/node/prerender.js'; prerender();\"",
+    "generate": "npm run lint -- --fix && vue-cli-service build && node --input-type=module -e \"import prerender from './src/node/prerender.js'; prerender();\"",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {

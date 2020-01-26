@@ -11,6 +11,10 @@ import PuppeteerRenderer from '@prerenderer/renderer-puppeteer';
 export default function () {
     console.log('Start static site generation');
 
+    // Get command line arguments
+    let args = process.argv.slice(1);
+
+    // Get directory name
     const __dirname = path.resolve();
 
     const preRenderer = new PreRenderer({
@@ -28,14 +32,42 @@ export default function () {
     // Initialize is separate from the constructor for flexibility of integration with build systems
     preRenderer.initialize()
     .then(() => {
-        // Get list of changed routes to pre-render
-        const changedRoutes = JSON.parse(fs.readFileSync('./src/data/changedRoutes.json', 'utf8'));
+        let routes = [];
+
+        switch (args[0]) {
+            case 'incremental':
+                console.log('Executing incremental build');
+
+                // Get list of changed routes to pre-render
+                routes = JSON.parse(fs.readFileSync('./src/data/changedRoutes.json', 'utf8'));
+
+                break;
+            case 'full':
+                console.log('Executing full build');
+
+                // All possible routes
+                let allRoutes = [];
+                // Get list of all possible routes to pre-render
+                const sites = JSON.parse(fs.readFileSync('./src/data/sites.json', 'utf8'));
+
+                // Create list of all routes
+                Object.keys(sites).map(sitePath => {
+                    sites[sitePath].map(site => {
+                        allRoutes.push('/' + sitePath + '/' + site.id);
+                    });
+                });
+                routes = allRoutes;
+
+                break;
+            default:
+                console.log('Build type not specified - execute: npm run generate [full, incremental]');
+        }
 
         // Add index route to generation
-        changedRoutes.push('/');
+        routes.push('/');
 
         // List of routes to render
-        return preRenderer.renderRoutes(changedRoutes);
+        return preRenderer.renderRoutes(routes);
     })
     .then(renderedRoutes => {
         // renderedRoutes is an array of objects in the format:
@@ -58,12 +90,12 @@ export default function () {
 
         // Shut down server and renderer
         preRenderer.destroy();
+
+        console.log('Finished static site generation');
     })
     .catch(err => {
         // Shut down server and renderer
         preRenderer.destroy();
         console.error(err);
     });
-
-    console.log('Finished static site generation');
 };

@@ -29,6 +29,7 @@ export default function () {
             // Options for debugging
             headless: true,
             devtools: false,
+            // Limit concurrent routes
             maxConcurrentRoutes: 16
         })
     });

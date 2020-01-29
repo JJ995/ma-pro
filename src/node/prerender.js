@@ -17,6 +17,9 @@ export default function () {
     // Get directory name
     const __dirname = path.resolve();
 
+    // List of routes to render
+    let routes = [];
+
     const preRenderer = new PreRenderer({
         // Required - the path to the app to pre-render - should have an index.html and any other needed assets
         staticDir: path.join(__dirname, 'dist'),
@@ -32,8 +35,6 @@ export default function () {
     // Initialize is separate from the constructor for flexibility of integration with build systems
     preRenderer.initialize()
     .then(() => {
-        let routes = [];
-
         switch (args[0]) {
             case 'incremental':
                 console.log('Executing incremental build');
@@ -90,6 +91,15 @@ export default function () {
 
         // Shut down server and renderer
         preRenderer.destroy();
+
+        // Print list of rendered routes
+        console.log('Rendered routes:');
+        for (let i = 0; i < routes.length; i++) {
+            console.log(routes[i]);
+        }
+
+        // Clear list of changed routes
+        fs.writeFileSync('./src/data/changedRoutes.json', JSON.stringify([]));
 
         console.log('Finished static site generation');
     })

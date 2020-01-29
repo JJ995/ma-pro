@@ -27,8 +27,9 @@ export default function () {
         // The plugin that actually renders the page
         renderer: new PuppeteerRenderer({
             // Options for debugging
-            headless: false,
-            devtools: true
+            headless: true,
+            devtools: false,
+            maxConcurrentRoutes: 16
         })
     });
 

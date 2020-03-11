@@ -36,6 +36,7 @@ export default function () {
              * High numbers of concurrent routes (e.g.: 64) require setting the default
              * navigation timeout to infinite with 'await page.setDefaultNavigationTimeout(0);'
              * in renderer.js to prevent crashes due to long page loading times (default 30s).
+             * [https://ourcodeworld.com/articles/read/1106/how-to-solve-puppeteer-timeouterror-navigation-timeout-of-30000-ms-exceeded]
              * However many concurrent routes yield worse performance!
              *
              * TEST: Normal test pages + 500 test .md-files

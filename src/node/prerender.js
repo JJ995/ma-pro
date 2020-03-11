@@ -1,5 +1,6 @@
 
 import fs  from 'fs';
+import fse  from 'fs-extra';
 import path from 'path';
 import mkdirp from 'mkdirp';
 import PreRenderer from '@prerenderer/prerenderer';
@@ -31,6 +32,18 @@ export default function () {
             devtools: false,
             // Limit concurrent routes
             maxConcurrentRoutes: 16
+            /**
+             * High numbers of concurrent routes (e.g.: 64) require setting the default
+             * navigation timeout to infinite with 'await page.setDefaultNavigationTimeout(0);'
+             * in renderer.js to prevent crashes due to long page loading times (default 30s).
+             * However many concurrent routes yield worse performance!
+             *
+             * TEST: Normal test pages + 500 test .md-files
+             *  4 concurrent routes: time to build: ~ 22s; total time: ~ 4m 55s;
+             *  8 concurrent routes: time to build: ~ 22s; total time: ~ 4m 39s;
+             * 16 concurrent routes: time to build: ~ 22s; total time: ~ 4m 39s;
+             * 32 concurrent routes: time to build: ~ 22s; total time: ~ 4m 59s;
+             */
         })
     });
 
@@ -39,14 +52,14 @@ export default function () {
     .then(() => {
         switch (args[0]) {
             case 'incremental':
-                console.log('Executing incremental build');
+                console.log('Executing incremental build\n');
 
                 // Get list of changed routes to pre-render
                 routes = JSON.parse(fs.readFileSync('./src/data/changedRoutes.json', 'utf8'));
 
                 break;
             case 'full':
-                console.log('Executing full build');
+                console.log('Executing full build\n');
 
                 // All possible routes
                 let allRoutes = [];
@@ -94,16 +107,41 @@ export default function () {
         // Shut down server and renderer
         preRenderer.destroy();
 
-        // Print list of rendered routes
-        console.log('Rendered routes:');
-        for (let i = 0; i < routes.length; i++) {
-            console.log(routes[i]);
-        }
-
         // Clear list of changed routes
         fs.writeFileSync('./src/data/changedRoutes.json', JSON.stringify([]));
 
         console.log('Finished static site generation');
+
+        /* Copy assets */
+
+        // Read list of assets
+        const assets = JSON.parse(fs.readFileSync('./src/assets.json', 'utf8'));
+        console.log('\nStart asset copy');
+        // Copy asset folders
+        assets.folders.forEach(assetFolder => {
+            // Clear asset folder
+            fse.emptyDir('./generated_static/' + assetFolder)
+            .then(() => {
+                // Copy assets
+                fse.copy('./dist/' + assetFolder, './generated_static/' + assetFolder, function (err) {
+                    if (err) {
+                        console.log('Error while copying ' + assetFolder + ' folder');
+                        return console.error(err);
+                    }
+                    console.log('Copied ' + assetFolder + ' folder');
+                });
+            })
+            .catch(err => {
+                console.error(err);
+            });
+        });
+        // Copy asset files
+        assets.rootFiles.forEach(assetFile => {
+            fs.copyFile('./dist/' + assetFile, './generated_static/' + assetFile, (err) => {
+                if (err) throw err;
+                console.log('Copied ' + assetFile);
+            });
+        });
     })
     .catch(err => {
         // Shut down server and renderer

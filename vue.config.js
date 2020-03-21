@@ -105,9 +105,21 @@ class WatchRunPlugin {
                             });
                         } catch (err) { console.error(err); }
                     } else if (relativePath.startsWith(VIEW_PATH)) {                            // View
-                        // View
-                        // TODO: think about implementation (regenerate everything if a view changes?)
-                        console.log('view');
+                        // Regenerate everything if a view changes
+                        console.log('View changed: all routes marked to be regenerated');
+
+                        // All possible routes
+                        let allRoutes = [];
+                        // Get list of all possible routes to pre-render
+                        const sites = JSON.parse(fs.readFileSync('./src/data/sites.json', 'utf8'));
+
+                        // Create list of all routes
+                        Object.keys(sites).map(sitePath => {
+                            sites[sitePath].map(site => {
+                                allRoutes.push('/' + sitePath + '/' + site.id);
+                            });
+                        });
+                        changedRoutes = allRoutes;
                     }
                 });
 

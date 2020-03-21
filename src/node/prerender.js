@@ -5,6 +5,7 @@ import path from 'path';
 import mkdirp from 'mkdirp';
 import PreRenderer from '@prerenderer/prerenderer';
 import PuppeteerRenderer from '@prerenderer/renderer-puppeteer';
+import JsDomRenderer from '@prerenderer/renderer-jsdom';
 
 /**
  * Static site generation based on list of changed routes
@@ -21,31 +22,73 @@ export default function () {
     // List of routes to render
     let routes = [];
 
+    /* Instantiate renderers */
+
+    // Puppeteer
+    const puppeteer = new PuppeteerRenderer({
+        // Options for debugging
+        headless: true,
+        devtools: false,
+        // Limit concurrent routes
+        maxConcurrentRoutes: 16
+        /**
+         * High numbers of concurrent routes (e.g.: 64) require setting the default
+         * navigation timeout to infinite with 'await page.setDefaultNavigationTimeout(0);'
+         * in renderer.js to prevent crashes due to long page loading times (default 30s).
+         * [https://ourcodeworld.com/articles/read/1106/how-to-solve-puppeteer-timeouterror-navigation-timeout-of-30000-ms-exceeded]
+         * However many concurrent routes yield worse performance!
+         *
+         * TEST: Normal test pages + 500 test .md-files
+         *  4 concurrent routes: time to build: ~ 22s; total time: ~ 4m 55s;
+         *  8 concurrent routes: time to build: ~ 22s; total time: ~ 4m 39s;
+         * 16 concurrent routes: time to build: ~ 22s; total time: ~ 4m 39s;
+         * 32 concurrent routes: time to build: ~ 22s; total time: ~ 4m 59s;
+         */
+    });
+    // JsDom
+    const jsDom = new JsDomRenderer({
+        // Limit concurrent routes (unlimited (0) might cause runtime issues)
+        maxConcurrentRoutes: 256,
+        // Enable asset loading and script execution
+        resources: "usable",
+        runScripts: "dangerously",
+        // Delay rendering until app is running
+        renderAfterTime: 10000
+        /**
+         * TEST: normal test pages + 500 test .md-files
+         * 128 concurrent routes: time to build: ~ 34s; total time: 1m 01s;
+         * 256 concurrent routes: time to build: ~ 34s; total time: 0m 56s;
+         * 512 concurrent routes: failed (hangs)
+         */
+    });
+
+    // Set renderer to use
+    let renderer = jsDom;
+    if (args[1] !== undefined) {
+        switch (args[1]) {
+            case 'fast':
+                renderer = jsDom;
+                console.log('Using fast JsDom renderer');
+                break;
+            case 'production':
+                renderer = puppeteer;
+                console.log('Using production puppeteer renderer');
+                break;
+            default:
+                console.log('Unknown renderer argument - execute: npm run generate [full, incremental] [fast, production]');
+                console.log('Using fast JsDom renderer as default');
+        }
+    } else {
+        console.log('Renderer not specified - execute: npm run generate [full, incremental] [fast, production]');
+        console.log('Using fast JsDom renderer as default');
+    }
+
     const preRenderer = new PreRenderer({
         // Required - the path to the app to pre-render - should have an index.html and any other needed assets
         staticDir: path.join(__dirname, 'dist'),
         indexPath: path.join(__dirname, 'dist/index.html'),
         // The plugin that actually renders the page
-        renderer: new PuppeteerRenderer({
-            // Options for debugging
-            headless: true,
-            devtools: false,
-            // Limit concurrent routes
-            maxConcurrentRoutes: 16
-            /**
-             * High numbers of concurrent routes (e.g.: 64) require setting the default
-             * navigation timeout to infinite with 'await page.setDefaultNavigationTimeout(0);'
-             * in renderer.js to prevent crashes due to long page loading times (default 30s).
-             * [https://ourcodeworld.com/articles/read/1106/how-to-solve-puppeteer-timeouterror-navigation-timeout-of-30000-ms-exceeded]
-             * However many concurrent routes yield worse performance!
-             *
-             * TEST: Normal test pages + 500 test .md-files
-             *  4 concurrent routes: time to build: ~ 22s; total time: ~ 4m 55s;
-             *  8 concurrent routes: time to build: ~ 22s; total time: ~ 4m 39s;
-             * 16 concurrent routes: time to build: ~ 22s; total time: ~ 4m 39s;
-             * 32 concurrent routes: time to build: ~ 22s; total time: ~ 4m 59s;
-             */
-        })
+        renderer: renderer
     });
 
     // Initialize is separate from the constructor for flexibility of integration with build systems
@@ -62,6 +105,10 @@ export default function () {
             case 'full':
                 console.log('Executing full build\n');
 
+                // Clear output directory on full build for clean state
+                console.log('Clearing output directory');
+                fse.emptyDirSync('./generated_static/');
+
                 // All possible routes
                 let allRoutes = [];
                 // Get list of all possible routes to pre-render
@@ -77,7 +124,7 @@ export default function () {
 
                 break;
             default:
-                console.log('Build type not specified - execute: npm run generate [full, incremental]');
+                console.log('Build type not specified - execute: npm run generate [full, incremental] [fast, production]');
         }
 
         // Add index route to generation
@@ -145,8 +192,8 @@ export default function () {
         });
     })
     .catch(err => {
+        console.error(err);
         // Shut down server and renderer
         preRenderer.destroy();
-        console.error(err);
     });
 };

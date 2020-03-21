@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@prerenderer/prerenderer": "^0.7.2",
+    "@prerenderer/renderer-jsdom": "^0.2.0",
     "@prerenderer/renderer-puppeteer": "^0.2.0",
     "core-js": "^3.3.2",
     "front-matter": "^3.0.2",

@@ -8,7 +8,7 @@ Vue.use(VueRouter);
 const routes = Object.keys(Entries).map(section => {
     const children = Entries[section].map(child => ({
         path: child.id,
-        name: child.title,
+        name: child.id,
         component: () => import(`../../content/${section}/${child.id}.md`).then((markdownComponent) => {
             markdownComponent.vue.component.components = {};
             for (let i = 0; i < child.components.length; i++) {

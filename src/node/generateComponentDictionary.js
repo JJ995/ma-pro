@@ -2,8 +2,7 @@
 import fs from 'fs';
 import findInDir from './findInDir.js';
 
-// Constants
-const COMPONENT_DIRECTORY_PATH = './src/components/';
+import config from '../../ssg.config.js';
 
 /**
  * Generate JSON-file with component data based on component directory
@@ -14,7 +13,7 @@ export default async function () {
     let components = [];        // Components array (stores list of available Vue components and their children)
 
     // Find all .vue files in component directory
-    let fileList = findInDir(COMPONENT_DIRECTORY_PATH, /\.vue$/);
+    let fileList = findInDir(config.componentDirectoryPath, /\.vue$/);
 
     // Iterate file list
     for (const fullPath of fileList) {

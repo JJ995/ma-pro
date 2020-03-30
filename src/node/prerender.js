@@ -3,9 +3,11 @@ import fs  from 'fs';
 import fse  from 'fs-extra';
 import path from 'path';
 import mkdirp from 'mkdirp';
-import PreRenderer from '@prerenderer/prerenderer';
-import PuppeteerRenderer from '@prerenderer/renderer-puppeteer';
-import JsDomRenderer from '@prerenderer/renderer-jsdom';
+import PreRenderer from '../node/vendor/prerenderer/prerenderer/es6/index.js';
+import PuppeteerRenderer from '../node/vendor/prerenderer/renderer-puppeteer/es6/renderer.js';
+import JsDomRenderer from '../node/vendor/prerenderer/renderer-jsdom/es6/renderer.js';
+
+import config from '../../ssg.config.js';
 
 /**
  * Static site generation based on list of changed routes
@@ -25,42 +27,21 @@ export default function () {
     /* Instantiate renderers */
 
     // Puppeteer
-    const puppeteer = new PuppeteerRenderer({
-        // Options for debugging
-        headless: true,
-        devtools: false,
-        // Limit concurrent routes
-        maxConcurrentRoutes: 16
-        /**
-         * High numbers of concurrent routes (e.g.: 64) require setting the default
-         * navigation timeout to infinite with 'await page.setDefaultNavigationTimeout(0);'
-         * in renderer.js to prevent crashes due to long page loading times (default 30s).
-         * [https://ourcodeworld.com/articles/read/1106/how-to-solve-puppeteer-timeouterror-navigation-timeout-of-30000-ms-exceeded]
-         * However many concurrent routes yield worse performance!
-         *
-         * TEST: Normal test pages + 500 test .md-files
-         *  4 concurrent routes: time to build: ~ 22s; total time: ~ 4m 55s;
-         *  8 concurrent routes: time to build: ~ 22s; total time: ~ 4m 39s;
-         * 16 concurrent routes: time to build: ~ 22s; total time: ~ 4m 39s;
-         * 32 concurrent routes: time to build: ~ 22s; total time: ~ 4m 59s;
-         */
-    });
+    const puppeteer = new PuppeteerRenderer(config.renderConfig.puppeteer);
     // JsDom
-    const jsDom = new JsDomRenderer({
-        // Limit concurrent routes (unlimited (0) might cause runtime issues)
-        maxConcurrentRoutes: 256,
-        // Enable asset loading and script execution
-        resources: "usable",
-        runScripts: "dangerously",
-        // Delay rendering until app is running
-        renderAfterTime: 10000
-        /**
-         * TEST: normal test pages + 500 test .md-files
-         * 128 concurrent routes: time to build: ~ 34s; total time: 1m 01s;
-         * 256 concurrent routes: time to build: ~ 34s; total time: 0m 56s;
-         * 512 concurrent routes: failed (hangs)
-         */
-    });
+    const jsDom = new JsDomRenderer(config.renderConfig.jsDom);
+
+    // Set default renderer based on config if not specified
+    let switchDefaultRenderer = function () {
+        if (config.renderConfig.defaultRenderer !== undefined) {
+            if (config.renderConfig.defaultRenderer === 'fast') {
+                console.log('Using fast JsDom renderer as default');
+            } else if (config.renderConfig.defaultRenderer === 'production') {
+                console.log('Using production puppeteer renderer as default');
+                renderer = puppeteer;
+            }
+        }
+    };
 
     // Set renderer to use
     let renderer = jsDom;
@@ -76,11 +57,11 @@ export default function () {
                 break;
             default:
                 console.log('Unknown renderer argument - execute: npm run generate [full, incremental] [fast, production]');
-                console.log('Using fast JsDom renderer as default');
+                switchDefaultRenderer();
         }
     } else {
         console.log('Renderer not specified - execute: npm run generate [full, incremental] [fast, production]');
-        console.log('Using fast JsDom renderer as default');
+        switchDefaultRenderer();
     }
 
     const preRenderer = new PreRenderer({
@@ -163,10 +144,9 @@ export default function () {
         /* Copy assets */
 
         // Read list of assets
-        const assets = JSON.parse(fs.readFileSync('./src/assets.json', 'utf8'));
         console.log('\nStart asset copy');
         // Copy asset folders
-        assets.folders.forEach(assetFolder => {
+        config.assets.folders.forEach(assetFolder => {
             // Clear asset folder
             fse.emptyDir('./generated_static/' + assetFolder)
             .then(() => {
@@ -184,7 +164,7 @@ export default function () {
             });
         });
         // Copy asset files
-        assets.rootFiles.forEach(assetFile => {
+        config.assets.rootFiles.forEach(assetFile => {
             fs.copyFile('./dist/' + assetFile, './generated_static/' + assetFile, (err) => {
                 if (err) throw err;
                 console.log('Copied ' + assetFile);

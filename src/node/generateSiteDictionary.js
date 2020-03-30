@@ -5,7 +5,9 @@ import fm from 'front-matter';
 import findInDir from './findInDir.js';
 import generateComponentDictionary from './generateComponentDictionary.js';
 
-// Constants
+import config from '../../ssg.config.js';
+
+// CONFIG
 const CONTENT_DIRECTORY_PATH = './content/';
 
 /**
@@ -49,15 +51,24 @@ export default async function () {
                 }
             }
 
+            // Add custom page attributes
+            let customAttributes = {};
+            if (config.frontMatterAttributes !== undefined && config.frontMatterAttributes.length !== 0) {
+                config.frontMatterAttributes.forEach(attribute => {
+                    customAttributes[attribute] = content.attributes[attribute];
+                });
+            }
+
+            // Create page object with custom attributes
+            let pageObject = {
+                'id': page,
+                'path': path,
+                'components': pageComponents,
+                ...customAttributes
+            };
+
             // Add page object to route
-            routes[path].push({
-                "id": page,
-                "title": page,
-                "description": content.attributes.description,
-                "date": content.attributes.date,
-                "path": path,
-                "components": pageComponents
-            });
+            routes[path].push(pageObject);
         }).catch((err) => {
             if (err) throw err;
         });

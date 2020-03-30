@@ -49,6 +49,7 @@ plugins.push(new beforeRunHook(refresh));
 class WatchRunPlugin {
     apply(compiler) {
         compiler.hooks.watchRun.tap('WatchRun', (comp) => {
+            // CONFIG
             const CONTENT_PATH = '\\content\\';
             const COMPONENT_PATH = '\\src\\components\\';
             const VIEW_PATH = '\\src\\views\\';
@@ -167,6 +168,7 @@ module.exports = {
         .tap(options => {
             return {
                 mode: [Mode.VUE_COMPONENT],
+                // CONFIG
                 vue: {
                     root: 'markdown-body'
                 }
@@ -177,7 +179,7 @@ module.exports = {
         plugins,
         devServer: {
             watchOptions: {
-                // Ignore
+                // CONFIG ignore list
                 ignored: [
                     __dirname + '\\src\\data\\changedRoutes.json',
                     __dirname + '\\src\\data\\components.json',

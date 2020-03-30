@@ -8,6 +8,7 @@
 const Mode = require('frontmatter-markdown-loader/mode');
 const exec = require('child_process').exec;
 const fs = require('fs');
+const path = require('path');
 
 const plugins = [];
 
@@ -69,14 +70,14 @@ class WatchRunPlugin {
                     const relativePath = file.replace(__dirname, '');
 
                     /* Check file type */
-                    if (relativePath.startsWith(CONTENT_PATH)) {                                // Route
+                    if (relativePath.startsWith(CONTENT_PATH) && path.extname(relativePath) === '.md') {                    // Route
                         // Extract route
                         let route = relativePath.replace(CONTENT_PATH, '');
                         // Strip file extension, replace backslash with forward slash
                         route = route.substring(0, route.length - 3).replace(/\\/g,'/');
                         // Add route to list of changed routes
                         changedRoutes.push('/' + route);
-                    } else if (relativePath.startsWith(COMPONENT_PATH)) {                       // Component
+                    } else if (relativePath.startsWith(COMPONENT_PATH)) {                                                   // Component
                         // Get component name (containing folder *must* be named accordingly)
                         const componentPathElements = relativePath.split('\\');
                         const componentName = componentPathElements[componentPathElements.length - 2];
@@ -105,7 +106,7 @@ class WatchRunPlugin {
                                 });
                             });
                         } catch (err) { console.error(err); }
-                    } else if (relativePath.startsWith(VIEW_PATH)) {                            // View
+                    } else if (relativePath.startsWith(VIEW_PATH)) {                                                        // View
                         // Regenerate everything if a view changes
                         console.log('View changed: all routes marked to be regenerated');
 

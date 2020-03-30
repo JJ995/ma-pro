@@ -1,9 +1,5 @@
 <template>
   <div class="home">
-    <img
-      alt="Vue logo"
-      src="../assets/logo.png"
-    >
     <div class="sections">
       <div
         v-for="(section, index) in Object.keys(entries)"

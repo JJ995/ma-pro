@@ -34,10 +34,10 @@ export default function () {
     // Set default renderer based on config if not specified
     let switchDefaultRenderer = function () {
         if (config.renderConfig.defaultRenderer !== undefined) {
-            if (config.renderConfig.defaultRenderer === 'fast') {
-                console.log('Using fast JsDom renderer as default');
-            } else if (config.renderConfig.defaultRenderer === 'production') {
-                console.log('Using production puppeteer renderer as default');
+            if (config.renderConfig.defaultRenderer === 'jsDom') {
+                console.log('Using jsDom renderer as default');
+            } else if (config.renderConfig.defaultRenderer === 'puppeteer') {
+                console.log('Using puppeteer renderer as default');
                 renderer = puppeteer;
             }
         }
@@ -47,20 +47,20 @@ export default function () {
     let renderer = jsDom;
     if (args[1] !== undefined) {
         switch (args[1]) {
-            case 'fast':
+            case 'jsDom':
                 renderer = jsDom;
-                console.log('Using fast JsDom renderer');
+                console.log('Using jsDom renderer');
                 break;
-            case 'production':
+            case 'puppeteer':
                 renderer = puppeteer;
-                console.log('Using production puppeteer renderer');
+                console.log('Using puppeteer renderer');
                 break;
             default:
-                console.log('Unknown renderer argument - execute: npm run generate [full, incremental] [fast, production]');
+                console.log('Unknown renderer argument - execute: npm run generate [full, incremental] [jsDom, puppeteer]');
                 switchDefaultRenderer();
         }
     } else {
-        console.log('Renderer not specified - execute: npm run generate [full, incremental] [fast, production]');
+        console.log('Renderer not specified - execute: npm run generate [full, incremental] [jsDom, puppeteer]');
         switchDefaultRenderer();
     }
 
@@ -105,7 +105,7 @@ export default function () {
 
                 break;
             default:
-                console.log('Build type not specified - execute: npm run generate [full, incremental] [fast, production]');
+                console.log('Build type not specified - execute: npm run generate [full, incremental] [jsDom, puppeteer]');
         }
 
         // Add index route to generation

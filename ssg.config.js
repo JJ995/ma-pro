@@ -3,7 +3,7 @@ module.exports = {
     componentDirectoryPath: './src/components/',
     frontMatterAttributes: ['title', 'description', 'date'],
     renderConfig: {
-        defaultRenderer: 'fast',            // [fast, production]
+        defaultRenderer: 'jsDom',            // [jsDom, puppeteer]
         puppeteer: {
             // Options for debugging
             headless: true,

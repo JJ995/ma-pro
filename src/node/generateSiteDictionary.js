@@ -1,6 +1,7 @@
 
 import fs  from 'fs';
 import fm from 'front-matter';
+import directoryTree from 'directory-tree';
 
 import findInDir from './findInDir.js';
 import generateComponentDictionary from './generateComponentDictionary.js';
@@ -23,6 +24,9 @@ export default async function () {
 
     // Find all .md files in content directory
     let fileList = findInDir(CONTENT_DIRECTORY_PATH, /\.md$/);
+
+    // Get directory tree
+    const tree = directoryTree(CONTENT_DIRECTORY_PATH, { extensions: /\.md$/ });
 
     // Get component list
     let componentsJson = fs.readFileSync('./src/data/components.json', 'utf8');
@@ -75,8 +79,10 @@ export default async function () {
     }
 
     // Write sites JSON-file with routes
-    let data = JSON.stringify(routes);
-    fs.writeFileSync('./src/data/sites.json', data);
+    fs.writeFileSync('./src/data/sites.json', JSON.stringify(routes));
+
+    // Write tree JSON-file
+    fs.writeFileSync('./src/data/siteTree.json', JSON.stringify(tree));
 
     console.log('Site dictionary written');
 };

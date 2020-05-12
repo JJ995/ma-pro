@@ -185,6 +185,7 @@ module.exports = {
                     __dirname + '\\src\\data\\changedRoutes.json',
                     __dirname + '\\src\\data\\components.json',
                     __dirname + '\\src\\data\\sites.json',
+                    __dirname + '\\src\\data\\siteTree.json',
                     __dirname + '\\.idea\\',
                     __dirname + '\\vue.config.js',
                 ]

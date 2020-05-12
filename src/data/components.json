@@ -1,1 +1,1 @@
-[{"name":"ButtonDecrement","path":"src\\components\\ButtonDecrement\\ButtonDecrement","childComponents":[]},{"name":"ButtonIncrement","path":"src\\components\\ButtonIncrement\\ButtonIncrement","childComponents":[]},{"name":"Counter","path":"src\\components\\Counter\\Counter","childComponents":["ButtonIncrement","ButtonDecrement"]}]
+[]

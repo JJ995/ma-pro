@@ -6,6 +6,7 @@
 </template>
 
 <style src="./styles/base.less" lang="less"></style>
+<style src="./styles/markdown-splendor.less" lang="less"></style>
 
 <script>
     import tree from './data/siteTree'

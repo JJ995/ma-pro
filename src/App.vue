@@ -1,8 +1,11 @@
 <template>
-    <div id="app">
-        <sidebar-menu :menu="menu"/>
-        <router-view/>
-    </div>
+  <div id="app">
+    <sidebar-menu
+      :menu="menu"
+      :hide-toggle="true"
+    />
+    <router-view />
+  </div>
 </template>
 
 <style src="./styles/base.less" lang="less"></style>
@@ -17,8 +20,7 @@
                 let menu = [];
                 menu.push({
                     header: true,
-                    title: 'Example Blog',
-                    hiddenOnCollapse: true
+                    title: 'Example Blog'
                 });
 
                 menu.push(tree);

@@ -172,6 +172,12 @@ module.exports = {
                 // CONFIG
                 vue: {
                     root: 'markdown-body'
+                },
+                markdownIt: {
+                    html: true,
+                    linkify: true,
+                    breaks: true,
+                    typographer: true
                 }
             }
         })

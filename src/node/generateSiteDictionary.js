@@ -49,9 +49,13 @@ export default async function () {
             let pageComponents = [];
 
             // Check for component occurrences
-            for (let i = 0; i < components.length; i++) {
-                if (data.indexOf('<' + components[i].name) !== -1) {
-                    pageComponents.push(components[i]);
+            if (content.attributes.components !== undefined && content.attributes.components !== 0) {
+                for (let i = 0; i < components.length; i++) {
+                    for (let j = 0; j < content.attributes.components.length; j++) {
+                        if (components[i].name === content.attributes.components[j]) {
+                            pageComponents.push(components[i]);
+                        }
+                    }
                 }
             }
 

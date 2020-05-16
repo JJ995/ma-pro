@@ -26,13 +26,14 @@ export default async function () {
             let componentObject = {
                 name: module.default.name,
                 path: componentPath,
-                childComponents: []
+                directChildComponents: [],
+                children: []
             };
 
             // Check for subcomponents
             if (module.default.components !== undefined && Object.keys(module.default.components).length) {
                 for (const key of Object.keys(module.default.components)) {
-                    componentObject.childComponents.push(module.default.components[key].name);
+                    componentObject.directChildComponents.push(module.default.components[key].name);
                 }
             }
 
@@ -42,9 +43,35 @@ export default async function () {
         });
     }
 
+    // Get all children of each component
+    components.forEach((component) => {
+        getChildren(component);
+
+    });
+
+    // Remove duplicates
+    components.forEach((component) => {
+        component.children = [...new Set(component.children)];
+    });
+
+    // Recursively iterate component dictionary to retrieve all dependencies of each component
+    function getChildren(component) {
+        if (component.directChildComponents !== undefined && component.directChildComponents.length !== 0) {
+            component.directChildComponents.forEach((childComponent) => {
+                for (let i = 0; i < components.length; i++) {
+                    if (components[i].name === childComponent) {
+                        return component.children = component.children.concat(getChildren(components[i]));
+                    }
+                }
+            });
+            return component.children.concat([component.name]);
+        } else {
+            return [component.name];
+        }
+    }
+
     // Write components JSON-file with routes
-    let data = JSON.stringify(components);
-    fs.writeFileSync('./src/data/components.json', data);
+    fs.writeFileSync('./src/data/components.json', JSON.stringify(components));
 
     console.log('Component dictionary written');
 }

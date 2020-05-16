@@ -16,6 +16,7 @@
     export default {
         name: 'App',
         computed: {
+            /* Menu */
             menu: function () {
                 let menu = [];
                 menu.push({
@@ -38,6 +39,27 @@
 
                 return menu;
             }
+        },
+        mounted: function () {
+            /**
+             * Fire ready event for static site generation (DO NOT REPLACE)
+             */
+            this.$nextTick(function () {
+                // Fire event when markdown content is rendered
+                let int = setInterval(() => {
+                    if (document.querySelector('.markdown-body')) {
+                        console.log('Content rendered');
+                        window.document.dispatchEvent(new Event('content-rendered'));
+                        clearInterval(int);
+                    }
+                }, 100);
+                // Fire event anyway after 5 seconds in case no markdown content is on page
+                window.setTimeout(() => {
+                    console.log('Content rendered (no markdown)');
+                    window.document.dispatchEvent(new Event('content-rendered'));
+                    clearInterval(int);
+                }, 5000);
+            });
         },
         methods: {
             formatHref: function (obj) {

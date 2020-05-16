@@ -95,8 +95,8 @@ class WatchRunPlugin {
                                                 changedRoutes.push('/' + site.path + '/' + site.id);
                                             }
                                             // Check child components
-                                            if (component.childComponents !== undefined) {
-                                                if (component.childComponents.includes(componentName)) {
+                                            if (component.children !== undefined) {
+                                                if (component.children.includes(componentName)) {
                                                     // Add route to list of changed routes
                                                     changedRoutes.push('/' + sitePath + '/' + site.id);
                                                 }

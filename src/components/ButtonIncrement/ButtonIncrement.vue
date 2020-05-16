@@ -1,7 +1,7 @@
 <template>
-  <button @click="count++">
+  <CustomButton :on-click="increment">
     {{ text }} | You incremented me {{ count }} times.
-  </button>
+  </CustomButton>
 </template>
 
 <script src="./ButtonIncrement.mjs"></script>

@@ -1,4 +1,13 @@
+---
+title:  "Splendor"
+description: "This is a markdown test entry styled with Splendor"
+date: 14.05.2020
+components: ["Counter"]
+---
+
 # Splendor
+
+<Counter headline="This is a counter component with two subcomponents"/>
 
 [Splendor](https://github.com/markdowncss/splendor) is the second of many stylesheets to make HTML generated from
 markdown look beautiful. A list of all available stylesheets can be found [here](https://github.com/markdowncss).

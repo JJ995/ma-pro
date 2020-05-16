@@ -1,7 +1,7 @@
 <template>
-  <button @click="count--">
+  <CustomButton :on-click="decrement">
     {{ text }} | You decremented me {{ count }} times.
-  </button>
+  </CustomButton>
 </template>
 
 <script src="./ButtonDecrement.mjs"></script>

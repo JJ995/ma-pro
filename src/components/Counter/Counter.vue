@@ -1,8 +1,10 @@
 <template>
   <div>
-    <h1>{{ headline }}</h1>
-    <button-decrement text="Minus" />
-    <button-increment text="Plus" />
+    <h3>{{ headline }}</h3>
+    <div style="text-align: center;">
+      <button-decrement text="Minus" />
+      <button-increment text="Plus" />
+    </div>
   </div>
 </template>
 

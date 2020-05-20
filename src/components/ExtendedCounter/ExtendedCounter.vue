@@ -1,7 +1,7 @@
 <template>
   <div>
-    <h3>This is an extended counter component</h3>
-    <Counter headline="This is the extended counter" />
+    <h3>This is the extended counter component</h3>
+    <Counter headline="Counter" />
   </div>
 </template>
 

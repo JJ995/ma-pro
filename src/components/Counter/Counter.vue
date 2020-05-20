@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="counter">
     <h3>{{ headline }}</h3>
     <div style="text-align: center;">
       <button-decrement text="Minus" />
@@ -9,3 +9,4 @@
 </template>
 
 <script src="./Counter.mjs"></script>
+<style src="./Counter.less" lang="less"></style>

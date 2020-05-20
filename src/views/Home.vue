@@ -1,12 +1,12 @@
 <template>
-  <div class="home">
+  <div class="content home">
     <div class="sections">
       <div
         v-for="(section, index) in Object.keys(entries)"
         :key="index"
         class="group"
       >
-        <h2 class="center">
+        <h2>
           {{ section }}
         </h2>
         <div
@@ -14,11 +14,11 @@
           :key="entry.id"
           class="section"
         >
-          <div class="entry">
+          <p class="entry">
             <router-link :to="{name: entry.id}">
-              {{ entry.title }} ({{ entry.date }}, {{ entry.description }})
+              {{ entry.title }} ({{ entry.date }}, {{ entry.author }})
             </router-link>
-          </div>
+          </p>
         </div>
       </div>
     </div>

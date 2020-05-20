@@ -1,18 +1,15 @@
 ---
-title:  "Splendor"
-description: "This is a markdown test entry styled with Splendor"
-date: 14.05.2020
-components: ["Counter"]
+title:  "About Us"
+author: "John Doe"
+date: 20.05.2020
+components: ["TopCounter"]
 ---
 
-# Splendor
+# About Us
 
-<Counter headline="This is a counter component with two subcomponents"/>
+<TopCounter />
 
-[Splendor](https://github.com/markdowncss/splendor) is the second of many stylesheets to make HTML generated from
-markdown look beautiful. A list of all available stylesheets can be found [here](https://github.com/markdowncss).
-
-#### A markdown theme that is absolutely _splendid_.
+#### Get in _touch_.
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vehicula pharetra ultricies. Cras magna turpis,
 vestibulum ut arcu et, rutrum porta velit. Curabitur luctus erat a velit tincidunt, vel malesuada nibh tempor.
@@ -60,5 +57,3 @@ gulp.task('watch', function() {
   1. Mow the lawn
   2. Feed the dog
   3. Dance
-
-Crafted with <3 by [John Otander](http://johnotander.com)([@4lpine](https://twitter.com/4lpine)).

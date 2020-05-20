@@ -1,6 +1,6 @@
 <template>
   <CustomButton :on-click="decrement">
-    {{ text }} | You decremented me {{ count }} times.
+    {{ text }} | You've decremented me {{ count }} times.
   </CustomButton>
 </template>
 

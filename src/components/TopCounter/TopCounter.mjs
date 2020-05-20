@@ -1,5 +1,5 @@
 export default {
-    name: 'AnotherExtendedCounter',
+    name: 'TopCounter',
     components: {
         ExtendedCounter: () => import('../../components/ExtendedCounter/ExtendedCounter.vue'),
     },

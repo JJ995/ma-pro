@@ -1,7 +1,7 @@
 /* Static site generation global config */
 module.exports = {
     componentDirectoryPath: './src/components/',
-    frontMatterAttributes: ['title', 'description', 'date'],
+    frontMatterAttributes: ['title', 'author', 'date'],
     renderConfig: {
         defaultRenderer: 'jsDom',            // [jsDom, puppeteer]
         puppeteer: {

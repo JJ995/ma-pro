@@ -1,6 +1,6 @@
 <template>
   <CustomButton :on-click="increment">
-    {{ text }} | You incremented me {{ count }} times.
+    {{ text }} | You've incremented me {{ count }} times.
   </CustomButton>
 </template>
 

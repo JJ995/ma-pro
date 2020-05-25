@@ -113,7 +113,7 @@ class WatchRunPlugin {
                         // All possible routes
                         let allRoutes = [];
                         // Get list of all possible routes to pre-render
-                        const sites = JSON.parse(fs.readFileSync('./src/data/sites.json', 'utf8'));
+                        const sites = JSON.parse(fs.readFileSync(SITES_PATH, 'utf8'));
 
                         // Create list of all routes
                         Object.keys(sites).map(sitePath => {

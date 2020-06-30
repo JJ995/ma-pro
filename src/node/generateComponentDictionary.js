@@ -46,7 +46,6 @@ export default async function () {
     // Get all children of each component
     components.forEach((component) => {
         getChildren(component);
-
     });
 
     // Remove duplicates

@@ -10,7 +10,7 @@ module.exports = {
             devtools: false,
             // Limit concurrent routes
             maxConcurrentRoutes: 16,
-            // Delay rendering until content is ready (fired in App.js)
+            // Delay extraction until content is ready (fired in App.js)
             renderAfterDocumentEvent: 'content-rendered'
             /**
              * High numbers of concurrent routes (e.g.: 64) require setting the default
@@ -32,7 +32,7 @@ module.exports = {
             // Enable asset loading and script execution
             resources: 'usable',
             runScripts: 'dangerously',
-            // Delay rendering until content is ready (fired in App.js)
+            // Delay extraction until content is ready (fired in App.js)
             renderAfterDocumentEvent: 'content-rendered'
             /**
              * TEST: normal test pages + 500 test .md-files

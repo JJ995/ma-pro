@@ -10,9 +10,16 @@ npm install
 npm run serve
 ```
 
-### Compiles and minifies for production
+### Generate static sites
 ```
-npm run build
+npm run generate [full, incremental] [jsDom, puppeteer]
+```
+_(For default settings, consider ``ssg.config.js``)_
+
+### Update dictionaries (optional)
+_(happens automatically during webpack watch-mode)_
+```
+npm run refresh
 ```
 
 ### Run your tests
@@ -27,3 +34,4 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+See configuration file: ``ssg.config.js``
